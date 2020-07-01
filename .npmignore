@@ -1,0 +1,19 @@
+
+/node_modules/
+/docs/
+.github
+/test/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+src/application/logs/
+htdocs/
