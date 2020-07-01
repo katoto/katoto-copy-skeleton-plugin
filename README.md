@@ -1,5 +1,7 @@
 ### copy ElemeFE page-skeleton-webpack-plugin
 
+katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
+
 <hr />
 
 <div align="center">
