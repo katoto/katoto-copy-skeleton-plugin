@@ -2,6 +2,9 @@
 
 katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
 
+附上该插件的简易时序图
+![](../skeletonImg.png)
+
 <hr />
 
 <div align="center">
