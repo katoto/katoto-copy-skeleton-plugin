@@ -3,7 +3,20 @@
 katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
 
 附上该插件的简易时序图
-![](../skeletonImg.png)
+![](https://raw.githubusercontent.com/katoto/katoto-copy-skeleton-plugin/master/skeletonImg.jpg)
+
+### 修改部分
+
+- 修复一些已知插件问题，详见 [官方 Demo 踩坑](https://juejin.im/post/5ed4c22ae51d4578810b5459)
+- 优化预览二维码，实现实时修改样式，二维码实时更新
+- 手机扫一扫预览，加入适配 flexible.js,保证看到的样式更真实
+- 调整 priview 预览，把原 1280 宽度改成 375 手机宽度
+
+### 待修改项
+
+- 打包之后没有适配 js ，会看到初始样式，然后是适配后的样式。 这些需要修改公共 js
+- 迁移到 web_leka
+- 是否可生成 weex 形式
 
 <hr />
 
@@ -113,7 +126,7 @@ const webpackConfig = {
   entry: "index.js",
   output: {
     path: __dirname + "/dist",
-    filename: "index.bundle.js",
+    filename: "index.bundle.js"
   },
   plugin: [
     new HtmlWebpackPlugin({
@@ -122,9 +135,9 @@ const webpackConfig = {
     new SkeletonPlugin({
       pathname: path.resolve(__dirname, `${customPath}`), // the path to store shell file
       staticDir: path.resolve(__dirname, "./dist"), // the same as the `output.path`
-      routes: ["/", "/search"], // Which routes you want to generate skeleton screen
-    }),
-  ],
+      routes: ["/", "/search"] // Which routes you want to generate skeleton screen
+    })
+  ]
 };
 ```
 
@@ -220,25 +233,25 @@ Re-package the application with webpack. When the page is restarted, you can see
 const pluginDefaultConfig = {
   port: "8989",
   text: {
-    color: "#EEEEEE",
+    color: "#EEEEEE"
   },
   image: {
     shape: "rect", // `rect` | `circle`
     color: "#EFEFEF",
-    shapeOpposite: [],
+    shapeOpposite: []
   },
   button: {
     color: "#EFEFEF",
-    excludes: [],
+    excludes: []
   },
   svg: {
     color: "#EFEFEF",
     shape: "circle", // circle | rect
-    shapeOpposite: [],
+    shapeOpposite: []
   },
   pseudo: {
     color: "#EFEFEF", // or transparent
-    shape: "circle", // circle | rect
+    shape: "circle" // circle | rect
   },
   device: "iPhone 6 Plus",
   debug: false,
@@ -246,7 +259,7 @@ const pluginDefaultConfig = {
     minifyCSS: { level: 2 },
     removeComments: true,
     removeAttributeQuotes: true,
-    removeEmptyAttributes: false,
+    removeEmptyAttributes: false
   },
   defer: 5000,
   excludes: [],
@@ -259,7 +272,7 @@ const pluginDefaultConfig = {
   logLevel: "info",
   quiet: false,
   noInfo: false,
-  logTime: true,
+  logTime: true
 };
 ```
 

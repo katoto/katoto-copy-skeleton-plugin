@@ -42,8 +42,9 @@
 <style scoped>
   .model {
     box-sizing: border-box;
-    width: 322px;
-    height: 635px;
+    /* width: 322px; */
+    width: 377px;
+    height: 685px;
     border: 1px solid #e8e8e8;
     border-radius: 30px;
     background: #fff;
@@ -191,15 +192,17 @@
     border-top-left-radius: 2px;
   }
   .body {
-    width: 100%;
-    height: 590px;
+    /* width: 100%; */
+    width: 375px;
+    height: 667px;
     margin-top: 25px;
   }
   .body iframe {
-    width: 400%;
-    height: 400%;
-    transform: scale(.25);
-    transform-origin: top left;
+    width: 375px;
+    /* transform: scale(.25);
+    transform-origin: top left; */
+    /* width: 400%; */
+    height: 100%;
   }
   .body iframe.origin {
     width: 100%;

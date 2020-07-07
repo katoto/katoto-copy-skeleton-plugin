@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="currentRoute">
     <bar-top
       @preview="preview"
       @genShell="writeShell"
@@ -61,7 +61,7 @@
       return {
         dialogVisible: false,
         dropDownRoutes: [],
-        currentRoute: '/',
+        currentRoute: '',
         currentSkeletonScreen: {
           url: '',
           skeletonPageUrl: '',
@@ -75,11 +75,14 @@
     },
     watch: {
       routes: function (value, oldValue) {
-        console.log(this.dropDownRoutes)
-        console.log('-=---------')
+        console.log(value)
+        console.log('-=---routes------')
         if (value !== oldValue && value) {
           this.dropDownRoutes = Object.keys(value).map(route => ({ route, url: value[route].url }))
-          this.currentSkeletonScreen = value[this.currentRoute]
+          this.currentSkeletonScreen = value[this.currentRoute] || value[Object.keys(value)[0]];
+          if(!this.currentRoute){
+            this.currentRoute = Object.keys(value)[0];
+          }
         }
       }
     },

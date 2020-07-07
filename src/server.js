@@ -218,6 +218,7 @@ class Server extends EventEmitter {
             this.routesData[route].html = html
             const fileName = await this.writeMagicHtml(html)
             this.routesData[route].skeletonPageUrl = `http://${this.host}:${this.port}/${fileName}`
+            this.routesData[route].qrCode = await generateQR(`http://${this.host}:${this.port}/${fileName}`)
             sockWrite([this.previewSocket], 'update', JSON.stringify(this.routesData))
           }
           break
