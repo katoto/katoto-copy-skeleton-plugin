@@ -2,8 +2,6 @@
 
 katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
 
-附上该插件的简易时序图
-![](https://raw.githubusercontent.com/katoto/katoto-copy-skeleton-plugin/master/skeletonImg.jpg)
 
 ### 修改部分
 
@@ -18,26 +16,9 @@ katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关�
 - 迁移到 web_leka
 - 是否可生成 weex 形式
 
+附上该插件的简易时序图
+![](https://raw.githubusercontent.com/katoto/katoto-copy-skeleton-plugin/master/skeletonImg.jpg)
 <hr />
-
-<div align="center">
-  <!-- Version -->
-  <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin">
-    <img src="https://badge.fury.io/gh/elemefe%2Fpage-skeleton-webpack-plugin.svg" alt="website">
-  </a>
-  <!-- License -->
-  <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin">
-    <img src="https://img.shields.io/github/license/ElemeFE/page-skeleton-webpack-plugin.svg?style=flat-square" alt="LICENSE">
-  </a>
-  <!-- Build Status -->
-  <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin">
-    <img src="https://travis-ci.org/ElemeFE/page-skeleton-webpack-plugin.svg?branch=master" alt="build">
-  </a>
-  <!-- Downloads weekly -->
-  <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin">
-    <img src="https://img.shields.io/npm/dw/page-skeleton-webpack-plugin.svg?style=flat-square" alt="download">
-  </a>
-</div>
 
 <div align="center">
 
