@@ -6,7 +6,6 @@ import image from './image'
 import pseudos from './pseudos'
 import svg from './svg'
 import text from './text'
-import aLabel from './aLabel'
 
 export {
   list,
@@ -16,6 +15,5 @@ export {
   image,
   pseudos,
   svg,
-  text,
-  aLabel
+  text
 }

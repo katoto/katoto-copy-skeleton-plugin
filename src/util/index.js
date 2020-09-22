@@ -32,8 +32,8 @@ async function writeShell(routesData, options) {
     const trimedRoute = route.replace(/\//g, '')
     let filePath = path.join(pathname, trimedRoute ? `${trimedRoute}.html` : 'index.html')
     // 防止已有html 后缀的形式
-    if (trimedRoute.indexOf('.html')>-1) {
-        filePath = path.join(pathname, trimedRoute ? `${trimedRoute}` : 'index.html')
+    if (trimedRoute.indexOf('.html') > -1) {
+      filePath = path.join(pathname, trimedRoute ? `${trimedRoute}` : 'index.html')
     }
     await fse.ensureDir(pathname)
     await promisify(fs.writeFile)(filePath, minifiedHtml, 'utf-8')

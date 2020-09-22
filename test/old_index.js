@@ -10,11 +10,11 @@ var Skeleton = (function (exports) {
   const DISPLAY_NONE = /display:\s*none/;
   const PRE_REMOVE_TAGS = ['script'];
   const AFTER_REMOVE_TAGS = ['title', 'meta', 'style'];
-  const CLASS_NAME_PREFEX = 'lk-';
-  const CONSOLE_SELECTOR = '.lk-console';
+  const CLASS_NAME_PREFEX = 'sk-';
+  const CONSOLE_SELECTOR = '.sk-console';
   // 最小 1 * 1 像素的透明 gif 图片
   const SMALLEST_BASE64 = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-  const MOCK_TEXT_ID = 'lk-txt-id';
+  const MOCK_TEXT_ID = 'sk-text-id';
   const Node = window.Node;
 
   /**
@@ -56,8 +56,8 @@ var Skeleton = (function (exports) {
   };
 
   const checkHasPseudoEle = (ele) => {
-    const hasBefore = getComputedStyle(ele, '::before').getPropertyValue('content') !== '' && getComputedStyle(ele, '::before').getPropertyValue('content') !== 'none';
-    const hasAfter = getComputedStyle(ele, '::after').getPropertyValue('content') !== '' && getComputedStyle(ele, '::after').getPropertyValue('content') !== 'none';
+    const hasBefore = getComputedStyle(ele, '::before').getPropertyValue('content') !== '';
+    const hasAfter = getComputedStyle(ele, '::after').getPropertyValue('content') !== '';
     if (hasBefore || hasAfter) {
       return { hasBefore, hasAfter, ele }
     }
@@ -118,7 +118,7 @@ var Skeleton = (function (exports) {
   };
 
   const setOpacity = (ele) => {
-    const className = CLASS_NAME_PREFEX + 'opy';
+    const className = CLASS_NAME_PREFEX + 'opacity';
     const rule = `{
     opacity: 0 !important;
   }`;
@@ -127,7 +127,7 @@ var Skeleton = (function (exports) {
   };
 
   const transparent = (ele) => {
-    const className = CLASS_NAME_PREFEX + 'tran';
+    const className = CLASS_NAME_PREFEX + 'transparent';
     const rule = `{
     color: ${TRANSPARENT} !important;
   }`;
@@ -164,11 +164,10 @@ var Skeleton = (function (exports) {
 
   /**
    * use the same config options as image block.
-   * 背景图的处理，大小是否要设置？是否可以去除？
    */
 
   function backgroundHandler(ele, { color, shape }) {
-    const imageClass = CLASS_NAME_PREFEX + 'img';
+    const imageClass = CLASS_NAME_PREFEX + 'image';
     const shapeClass = CLASS_NAME_PREFEX + shape;
     const rule = `{
     background: ${color} !important;
@@ -186,8 +185,8 @@ var Skeleton = (function (exports) {
    */
 
   function buttonHandler(ele, { color, excludes }) {
-    if (excludes.indexOf(ele) > -1) return false;
-    const classname = CLASS_NAME_PREFEX + "btn";
+    if (excludes.indexOf(ele) > -1) return false
+    const classname = CLASS_NAME_PREFEX + 'button';
     const rule = `{
     color: ${color} !important;
     background: ${color} !important;
@@ -196,10 +195,6 @@ var Skeleton = (function (exports) {
   }`;
     addStyle(`.${classname}`, rule);
     ele.classList.add(classname);
-    //   去除按钮 type value disabled 业务属性 骨架样式无需关注
-    if (ele.hasAttribute("type")) ele.removeAttribute("type");
-    if (ele.hasAttribute("value")) ele.removeAttribute("value");
-    if (ele.hasAttribute("disabled")) ele.removeAttribute("disabled");
   }
 
   function grayHandler(ele, { color }) {
@@ -228,12 +223,11 @@ var Skeleton = (function (exports) {
       src: SMALLEST_BASE64
     };
 
-    const finalShape =
-      shapeOpposite.indexOf(ele) > -1 ? getOppositeShape(shape) : shape;
+    const finalShape = shapeOpposite.indexOf(ele) > -1 ? getOppositeShape(shape) : shape;
 
     setAttributes(ele, attrs);
-
-    const className = CLASS_NAME_PREFEX + "img";
+    
+    const className = CLASS_NAME_PREFEX + 'image';
     const shapeName = CLASS_NAME_PREFEX + finalShape;
     const rule = `{
     background: ${color} !important;
@@ -243,13 +237,9 @@ var Skeleton = (function (exports) {
 
     addClassName(ele, [className, shapeName]);
 
-    if (ele.hasAttribute("alt")) {
-      ele.removeAttribute("alt");
+    if (ele.hasAttribute('alt')) {
+      ele.removeAttribute('alt');
     }
-    //   去除img resize align border vspac hspace 业务属性 骨架样式无需关注
-    if (ele.hasAttribute("resize")) ele.removeAttribute("resize");
-    if (ele.hasAttribute("hspace")) ele.removeAttribute("hspace");
-    if (ele.hasAttribute("vspace")) ele.removeAttribute("vspace");
   }
 
   function pseudosHandler({ ele, hasBefore, hasAfter }, { color, shape, shapeOpposite }) {
@@ -280,12 +270,15 @@ var Skeleton = (function (exports) {
     addClassName(ele, [PSEUDO_CLASS, finalShape === 'circle' ? PSEUDO_CIRCLE_CLASS : PSEUDO_RECT_CLASS]);
   }
 
-  function svgHandler(ele, { color, shape }, cssUnit, decimal) {
+  function svgHandler(ele, { color, shape, shapeOpposite }, cssUnit, decimal) {
     const { width, height } = ele.getBoundingClientRect();
 
     if (width === 0 || height === 0 || ele.getAttribute('aria-hidden') === 'true') {
       return removeElement(ele)
     }
+  //   del 形状取反问题删除
+    const finalShape = shapeOpposite.indexOf(ele) > -1 ? getOppositeShape(shape) : shape;
+
     emptyElement(ele);
 
     const shapeClassName = CLASS_NAME_PREFEX + shape;
@@ -370,7 +363,8 @@ var Skeleton = (function (exports) {
   function textHandler(ele, { color }, cssUnit, decimal) {
     const { width } = ele.getBoundingClientRect();
     // if the text block's width is less than 50, just set it to transparent.
-    if (width <= 20) {
+    if (width <= 50) {
+      //   if (width <= 20) {
       return setOpacity(ele);
     }
     const comStyle = getComputedStyle(ele);
@@ -421,7 +415,7 @@ var Skeleton = (function (exports) {
   )}`;
     const className =
       CLASS_NAME_PREFEX +
-      "txt-" +
+      "text-" +
       firstColorPoint.toString(32).replace(/\./g, "-");
 
     const rule = `{
@@ -431,7 +425,7 @@ var Skeleton = (function (exports) {
   }`;
 
     //   width: ${px2relativeUtil(width, cssUnit, decimal)};
-    const invariableClassName = CLASS_NAME_PREFEX + "txt";
+    const invariableClassName = CLASS_NAME_PREFEX + "text";
 
     const invariableRule = `{
     background-origin: content-box !important;
@@ -477,23 +471,6 @@ var Skeleton = (function (exports) {
       }
     }
     //   ele.innerText = 's'
-  }
-
-  /**
-   * a 标签去除无用数据
-   */
-
-  function aHandler(ele) {
-    //   去除a标签的属性 href title target 业务属性 骨架样式无需关注
-    if (ele.hasAttribute("href")) ele.removeAttribute("href");
-    if (ele.hasAttribute("title")) ele.removeAttribute("title");
-    if (ele.hasAttribute("target")) ele.removeAttribute("target");
-    if (ele.hasAttribute("type")) ele.removeAttribute("type");
-    if (ele.hasAttribute("download")) ele.removeAttribute("download");
-    if (ele.hasAttribute("name")) ele.removeAttribute("name");
-    if (ele.hasAttribute("rel")) ele.removeAttribute("rel");
-    if (ele.hasAttribute("media")) ele.removeAttribute("media");
-    console.log(ele);
   }
 
   const addBlick = () => {
@@ -616,20 +593,9 @@ var Skeleton = (function (exports) {
   };
 
   function traverse(options) {
-    const {
-      remove,
-      excludes,
-      text,
-      image,
-      button,
-      svg,
-      grayBlock,
-      pseudo,
-      cssUnit,
-      decimal
-    } = options;
-    const excludesEle = excludes.length ? Array.from($$(excludes.join(","))) : [];
-    const grayEle = grayBlock.length ? Array.from($$(grayBlock.join(","))) : [];
+    const { remove, excludes, text, image, button, svg, grayBlock, pseudo, cssUnit, decimal } = options;
+    const excludesEle = excludes.length ? Array.from($$(excludes.join(','))) : [];
+    const grayEle = grayBlock.length ? Array.from($$(grayBlock.join(','))) : [];
     const rootElement = document.documentElement;
 
     const texts = [];
@@ -641,41 +607,39 @@ var Skeleton = (function (exports) {
     const pseudos = []; // 伪元素的处理
     const gradientBackEles = [];
     const grayBlocks = [];
-    const aLabelArr = [];
 
     if (Array.isArray(remove)) {
       remove.push(CONSOLE_SELECTOR, ...PRE_REMOVE_TAGS);
-      toRemove.push(...$$(remove.join(",")));
+      toRemove.push(...$$(remove.join(',')));
     }
 
     if (button && button.excludes.length) {
       // translate selector to element
-      button.excludes = Array.from($$(button.excludes.join(",")));
+      button.excludes = Array.from($$(button.excludes.join(',')));
     }
-
-    [svg, pseudo, image].forEach(type => {
+  [svg, pseudo, image].forEach(type => {
       if (type.shapeOpposite.length) {
-        type.shapeOpposite = Array.from($$(type.shapeOpposite.join(",")));
+        type.shapeOpposite = Array.from($$(type.shapeOpposite.join(',')));
       }
-    });
-    (function preTraverse(ele) {
+    })
+
+    ;(function preTraverse(ele) {
       const styles = getComputedStyle(ele);
       const hasPseudoEle = checkHasPseudoEle(ele);
-      if (!inViewPort(ele) || DISPLAY_NONE.test(ele.getAttribute("style"))) {
-        return toRemove.push(ele);
+      if (!inViewPort(ele) || DISPLAY_NONE.test(ele.getAttribute('style'))) {
+        return toRemove.push(ele)
       }
-      if (~grayEle.indexOf(ele)) {
-        // eslint-disable-line no-bitwise
-        return grayBlocks.push(ele);
+      if (~grayEle.indexOf(ele)) { // eslint-disable-line no-bitwise
+        return grayBlocks.push(ele)
       }
-      if (~excludesEle.indexOf(ele)) return false; // eslint-disable-line no-bitwise
+      if (~excludesEle.indexOf(ele)) return false // eslint-disable-line no-bitwise
 
       if (hasPseudoEle) {
         pseudos.push(hasPseudoEle);
       }
 
       if (checkHasBorder(styles)) {
-        ele.style.border = "none";
+        ele.style.border = 'none';
       }
 
       if (ele.children.length > 0 && /UL|OL/.test(ele.tagName)) {
@@ -686,45 +650,30 @@ var Skeleton = (function (exports) {
       }
 
       // 将所有拥有 textChildNode 子元素的元素的文字颜色设置成背景色，这样就不会在显示文字了。
-      if (
-        ele.childNodes &&
-        Array.from(ele.childNodes).some(n => n.nodeType === Node.TEXT_NODE)
-      ) {
+      if (ele.childNodes && Array.from(ele.childNodes).some(n => n.nodeType === Node.TEXT_NODE)) {
         transparent(ele);
       }
       if (checkHasTextDecoration(styles)) {
         ele.style.textDecorationColor = TRANSPARENT;
       }
       // 隐藏所有 svg 元素
-      if (ele.tagName === "svg" || ele.tagName === "SVG") {
-        return svgs.push(ele);
+      if (ele.tagName === 'svg') {
+        return svgs.push(ele)
       }
-      // 收集a 标签
-      if (ele.tagName === "a" || ele.tagName === "A") {
-        aLabelArr.push(ele);
+      if (EXT_REG.test(styles.background) || EXT_REG.test(styles.backgroundImage)) {
+        return hasImageBackEles.push(ele)
       }
-
-      if (
-        EXT_REG.test(styles.background) ||
-        EXT_REG.test(styles.backgroundImage)
-      ) {
-        return hasImageBackEles.push(ele);
+      if (GRADIENT_REG.test(styles.background) || GRADIENT_REG.test(styles.backgroundImage)) {
+        return gradientBackEles.push(ele)
       }
-      if (
-        GRADIENT_REG.test(styles.background) ||
-        GRADIENT_REG.test(styles.backgroundImage)
-      ) {
-        return gradientBackEles.push(ele);
-      }
-      if (ele.tagName === "IMG" || isBase64Img(ele)) {
-        return imgs.push(ele);
+      if (ele.tagName === 'IMG' || isBase64Img(ele)) {
+        return imgs.push(ele)
       }
       if (
         ele.nodeType === Node.ELEMENT_NODE &&
-        (ele.tagName === "BUTTON" ||
-          (ele.tagName === "A" && ele.getAttribute("role") === "button"))
+        (ele.tagName === 'BUTTON' || (ele.tagName === 'A' && ele.getAttribute('role') === 'button'))
       ) {
-        return buttons.push(ele);
+        return buttons.push(ele)
       }
       if (
         ele.childNodes &&
@@ -732,9 +681,9 @@ var Skeleton = (function (exports) {
         ele.childNodes[0].nodeType === Node.TEXT_NODE &&
         /\S/.test(ele.childNodes[0].textContent)
       ) {
-        return texts.push(ele);
+        return texts.push(ele)
       }
-    })(rootElement);
+    }(rootElement));
 
     svgs.forEach(e => svgHandler(e, svg, cssUnit, decimal));
     texts.forEach(e => textHandler(e, text, cssUnit, decimal));
@@ -744,25 +693,28 @@ var Skeleton = (function (exports) {
     pseudos.forEach(e => pseudosHandler(e, pseudo));
     gradientBackEles.forEach(e => backgroundHandler(e, image));
     grayBlocks.forEach(e => grayHandler(e, button));
-    aLabelArr.forEach(e => aHandler(e));
     // remove mock text wrapper
     const offScreenParagraph = $(`#${MOCK_TEXT_ID}`);
     if (offScreenParagraph && offScreenParagraph.parentNode) {
-      console.log(offScreenParagraph);
-      console.log("======position paragraph==");
+        console.log(offScreenParagraph);
+        console.log('======position paragraph==');
       toRemove.push(offScreenParagraph.parentNode);
     }
     toRemove.forEach(e => removeElement(e));
   }
 
   function genSkeleton(options) {
-    const { remove, hide, loading = "spin" } = options;
+    const {
+      remove,
+      hide,
+      loading = 'spin'
+    } = options;
     /**
      * before walk
      */
     // 将 `hide` 队列中的元素通过调节透明度为 0 来进行隐藏
     if (hide.length) {
-      const hideEle = $$(hide.join(","));
+      const hideEle = $$(hide.join(','));
       Array.from(hideEle).forEach(ele => setOpacity(ele));
     }
     /**
@@ -772,19 +724,18 @@ var Skeleton = (function (exports) {
     /**
      * add `<style>`
      */
-    let rules = "";
+    let rules = '';
 
     for (const [selector, rule] of styleCache) {
       rules += `${selector} ${rule}\n`;
     }
 
-    const styleEle = document.createElement("style");
+    const styleEle = document.createElement('style');
 
-    if (!window.createPopup) {
-      // For Safari
-      styleEle.appendChild(document.createTextNode(""));
+    if (!window.createPopup) { // For Safari
+      styleEle.appendChild(document.createTextNode(''));
     }
-    styleEle.innerHTML = rules;
+      styleEle.innerHTML = rules;
     if (document.head) {
       document.head.appendChild(styleEle);
     } else {
@@ -794,40 +745,34 @@ var Skeleton = (function (exports) {
      * add animation of skeleton page when loading
      */
     switch (loading) {
-      case "chiaroscuro":
+      case 'chiaroscuro':
         addBlick();
-        break;
-      case "spin":
+        break
+      case 'spin':
         addSpin();
-        break;
-      case "shine":
+        break
+      case 'shine':
         addShine();
-        break;
+        break
       default:
         addSpin();
-        break;
+        break
     }
   }
 
   function getHtmlAndStyle() {
     const root = document.documentElement;
     const rawHtml = root.outerHTML;
-    const styles = Array.from($$("style")).map(
-      style => style.innerHTML || style.innerText
-    );
-    Array.from($$(AFTER_REMOVE_TAGS.join(","))).forEach(ele =>
-      removeElement(ele)
-    );
+    const styles = Array.from($$('style')).map(style => style.innerHTML || style.innerText);
+    Array.from($$(AFTER_REMOVE_TAGS.join(','))).forEach(ele => removeElement(ele));
     // fix html parser can not handle `<div ubt-click=3659 ubt-data="{&quot;restaurant_id&quot;:1236835}" >`
     // need replace `&quot;` into `'`
-    const cleanedHtml = document.body.innerHTML
-      .replace(/&quot;/g, "'")
-      .replace(/<!---->/g, "");
+    const cleanedHtml = document.body.innerHTML.replace(/&quot;/g, "'");
     return {
       rawHtml,
       styles,
       cleanedHtml
-    };
+    }
   }
 
   exports.genSkeleton = genSkeleton;

@@ -2,10 +2,10 @@
 
 katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
 
-
 ### 修改部分
 
 - 修复一些已知插件问题，详见 [官方 Demo 踩坑](https://juejin.im/post/5ed4c22ae51d4578810b5459)
+- 去除原 after-emit 的 outputSkeletonScreen， 改用自己的
 - 优化预览二维码，实现实时修改样式，二维码实时更新
 - 手机扫一扫预览，加入适配 flexible.js,保证看到的样式更真实
 - 调整 priview 预览，把原 1280 宽度改成 375 手机宽度
@@ -15,9 +15,13 @@ katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关�
 - 打包之后没有适配 js ，会看到初始样式，然后是适配后的样式。 这些需要修改公共 js
 - 迁移到 web_leka
 - 是否可生成 weex 形式
+- 生成的骨架屏图片宽高有点不对
 
 附上该插件的简易时序图
 ![](https://raw.githubusercontent.com/katoto/katoto-copy-skeleton-plugin/master/skeletonImg.jpg)
+
+https://github.com/Jocs/jocs.github.io/issues/2
+
 <hr />
 
 <div align="center">

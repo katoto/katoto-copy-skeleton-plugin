@@ -118,7 +118,7 @@ function textHandler(ele, { color }, cssUnit, decimal) {
   )}`;
   const className =
     CLASS_NAME_PREFEX +
-    "txt-" +
+    "text-" +
     firstColorPoint.toString(32).replace(/\./g, "-");
 
   const rule = `{
@@ -128,7 +128,7 @@ function textHandler(ele, { color }, cssUnit, decimal) {
   }`;
 
   //   width: ${px2relativeUtil(width, cssUnit, decimal)};
-  const invariableClassName = CLASS_NAME_PREFEX + "txt";
+  const invariableClassName = CLASS_NAME_PREFEX + "text";
 
   const invariableRule = `{
     background-origin: content-box !important;

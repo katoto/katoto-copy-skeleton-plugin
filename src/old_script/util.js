@@ -19,6 +19,8 @@ export const checkHasPseudoEle = (ele) => {
   const hasBefore = getComputedStyle(ele, '::before').getPropertyValue('content') !== '' && getComputedStyle(ele, '::before').getPropertyValue('content') !== 'none'
   const hasAfter = getComputedStyle(ele, '::after').getPropertyValue('content') !== '' && getComputedStyle(ele, '::after').getPropertyValue('content') !== 'none'
   if (hasBefore || hasAfter) {
+      console.log(ele)
+      console.log('------ele---')
     return { hasBefore, hasAfter, ele }
   }
   return false
@@ -78,7 +80,7 @@ export const addClassName = (ele, classArray) => {
 }
 
 export const setOpacity = (ele) => {
-  const className = CLASS_NAME_PREFEX + 'opy'
+  const className = CLASS_NAME_PREFEX + 'opacity'
   const rule = `{
     opacity: 0 !important;
   }`
@@ -87,7 +89,7 @@ export const setOpacity = (ele) => {
 }
 
 export const transparent = (ele) => {
-  const className = CLASS_NAME_PREFEX + 'tran'
+  const className = CLASS_NAME_PREFEX + 'transparent'
   const rule = `{
     color: ${TRANSPARENT} !important;
   }`

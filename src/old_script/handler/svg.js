@@ -1,13 +1,16 @@
-import { emptyElement, removeElement, px2relativeUtil, setOpacity, addClassName } from '../util'
+import { emptyElement, removeElement, getOppositeShape, px2relativeUtil, setOpacity, addClassName } from '../util'
 import { TRANSPARENT, CLASS_NAME_PREFEX } from '../config'
 import { addStyle, shapeStyle } from './styleCache'
 
-function svgHandler(ele, { color, shape }, cssUnit, decimal) {
+function svgHandler(ele, { color, shape, shapeOpposite }, cssUnit, decimal) {
   const { width, height } = ele.getBoundingClientRect()
 
   if (width === 0 || height === 0 || ele.getAttribute('aria-hidden') === 'true') {
     return removeElement(ele)
   }
+//   del 形状取反问题删除
+  const finalShape = shapeOpposite.indexOf(ele) > -1 ? getOppositeShape(shape) : shape
+
   emptyElement(ele)
 
   const shapeClassName = CLASS_NAME_PREFEX + shape
