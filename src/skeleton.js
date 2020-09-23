@@ -1,225 +1,253 @@
-'use strict'
+"use strict";
 
-const puppeteer = require('puppeteer')
-const devices = require('puppeteer/DeviceDescriptors')
-const { parse, toPlainObject, fromPlainObject, generate } = require('css-tree')
-const { sleep, genScriptContent, htmlMinify, collectImportantComments } = require('./util')
+const puppeteer = require("puppeteer");
+const devices = require("puppeteer/DeviceDescriptors");
+const { parse, toPlainObject, fromPlainObject, generate } = require("css-tree");
+const {
+  sleep,
+  genScriptContent,
+  htmlMinify,
+  collectImportantComments
+} = require("./util");
 
 class Skeleton {
   constructor(options = {}, log) {
-    this.options = options
-    this.browser = null
-    this.scriptContent = ''
-    this.pages = new Set()
-    this.log = log
-    this.initialize()
+    this.options = options;
+    this.browser = null;
+    this.scriptContent = "";
+    this.pages = new Set();
+    this.log = log;
+    this.initialize();
   }
 
   // Launch headless Chrome by puppeteer and load script
   async initialize() {
-    const { headless } = this.options
-    const { log } = this
+    const { headless } = this.options;
+    const { log } = this;
     try {
       // load script content from `script` folder
-      this.scriptContent = await genScriptContent()
+      this.scriptContent = await genScriptContent();
       // Launch the browser
-      this.browser = await puppeteer.launch({ headless })
+      this.browser = await puppeteer.launch({ headless });
     } catch (err) {
-      log(err)
+      log(err);
     }
   }
 
   async newPage() {
-    const { device, debug } = this.options
-    const page = await this.browser.newPage()
-    this.pages.add(page)
-    await page.emulate(devices[device])
+    const { device, debug } = this.options;
+    const page = await this.browser.newPage();
+    this.pages.add(page);
+    await page.emulate(devices[device]);
     if (debug) {
-      page.on('console', (...args) => {
-        this.log.info(...args)
-      })
+      page.on("console", (...args) => {
+        this.log.info(...args);
+      });
     }
-    return page
+    return page;
   }
 
   async closePage(page) {
-    await page.close()
-    return this.pages.delete(page)
+    await page.close();
+    return this.pages.delete(page);
   }
 
   // Generate the skeleton screen for the specific `page`
   async makeSkeleton(page) {
-    console.log('=======page=====')
-    const { defer } = this.options
-    await page.addScriptTag({ content: this.scriptContent })
-    await sleep(defer)
-    await page.evaluate((options) => {
-      Skeleton.genSkeleton(options)
-    }, this.options)
+    console.log("=======page=====");
+    const { defer } = this.options;
+    await page.addScriptTag({ content: this.scriptContent });
+    await sleep(defer);
+    await page.evaluate(options => {
+      Skeleton.genSkeleton(options);
+    }, this.options);
   }
 
   async genHtml(url, route) {
-    const stylesheetAstObjects = {}
-    const stylesheetContents = {}
+    const stylesheetAstObjects = {};
+    const stylesheetContents = {};
 
-    const page = await this.newPage()
-    const { cookies } = this.options
+    const page = await this.newPage();
+    const { cookies } = this.options;
 
-    await page.setRequestInterception(true)
-    page.on('request', (request) => {
+    await page.setRequestInterception(true);
+    page.on("request", request => {
       if (stylesheetAstObjects[request.url]) {
         // don't need to download the same assets
-        request.abort()
+        request.abort();
       } else {
-        request.continue()
+        request.continue();
       }
-    })
+    });
     // To build a map of all downloaded CSS (css use link tag)
-    page.on('response', (response) => {
-      const requestUrl = response.url()
-      const ct = response.headers()['content-type'] || ''
+    page.on("response", response => {
+      const requestUrl = response.url();
+      const ct = response.headers()["content-type"] || "";
       if (response.ok && !response.ok()) {
-        throw new Error(`${response.status} on ${requestUrl}`)
+        throw new Error(`${response.status} on ${requestUrl}`);
       }
 
-      if (ct.indexOf('text/css') > -1 || /\.css$/i.test(requestUrl)) {
-        response.text().then((text) => {
+      if (ct.indexOf("text/css") > -1 || /\.css$/i.test(requestUrl)) {
+        response.text().then(text => {
           const ast = parse(text, {
             parseValue: false,
             parseRulePrelude: false
-          })
-          stylesheetAstObjects[requestUrl] = toPlainObject(ast)
-          stylesheetContents[requestUrl] = text
-        })
+          });
+          stylesheetAstObjects[requestUrl] = toPlainObject(ast);
+          stylesheetContents[requestUrl] = text;
+        });
       }
-    })
-    page.on('pageerror', (error) => {
-      throw error
-    })
-
+    });
+    page.on("pageerror", error => {
+      throw error;
+    });
 
     if (cookies.length) {
-      await page.setCookie(...cookies.filter(cookie => typeof cookie === 'object'))
+      await page.setCookie(
+        ...cookies.filter(cookie => typeof cookie === "object")
+      );
     }
-    console.log(url)
+    console.log(url);
     // url = 'http://10.1.13.167:8080/activity/co_brand_card.html'
-    const response = await page.goto(url, { waitUntil: 'networkidle2' })
+    const response = await page.goto(url, { waitUntil: "networkidle2" });
     if (response && !response.ok()) {
-      throw new Error(`${response.status} on ${url}`)
+      throw new Error(`${response.status} on ${url}`);
     }
 
+    await this.makeSkeleton(page);
 
-    await this.makeSkeleton(page)
+    const { styles, cleanedHtml } = await page.evaluate(() =>
+      Skeleton.getHtmlAndStyle()
+    );
 
-    const { styles, cleanedHtml } = await page.evaluate(() => Skeleton.getHtmlAndStyle())
-
-    const stylesheetAstArray = styles.map((style) => {
+    const stylesheetAstArray = styles.map(style => {
       const ast = parse(style, {
         parseValue: false,
         parseRulePrelude: false
-      })
-      return toPlainObject(ast)
-    })
+      });
+      return toPlainObject(ast);
+    });
 
-    const cleanedCSS = await page.evaluate(async (stylesheetAstObjects, stylesheetAstArray) => { // eslint-disable-line no-shadow
-      const DEAD_OBVIOUS = new Set(['*', 'body', 'html'])
-      const cleanedStyles = []
+    const cleanedCSS = await page.evaluate(
+      async (stylesheetAstObjects, stylesheetAstArray) => {
+        // eslint-disable-line no-shadow
+        const DEAD_OBVIOUS = new Set(["*", "body", "html"]);
+        const cleanedStyles = [];
 
-      const checker = (selector) => {
-        if (DEAD_OBVIOUS.has(selector)) {
-          return true
-        }
-        if (/:-(ms|moz)-/.test(selector)) {
-          return true
-        }
-        if (/:{1,2}(before|after)/.test(selector)) {
-          return true
-        }
-        try {
-          const keep = !!document.querySelector(selector)
-          return keep
-        } catch (err) {
-          const exception = err.toString()
-          console.log(`Unable to querySelector('${selector}') [${exception}]`, 'error') // eslint-disable-line no-console
-          return false
-        }
-      }
+        const checker = selector => {
+          if (DEAD_OBVIOUS.has(selector)) {
+            return true;
+          }
+          if (/:-(ms|moz)-/.test(selector)) {
+            return true;
+          }
+          if (/:{1,2}(before|after)/.test(selector)) {
+            return true;
+          }
+          try {
+            const keep = !!document.querySelector(selector);
+            return keep;
+          } catch (err) {
+            const exception = err.toString();
+            console.log(
+              `Unable to querySelector('${selector}') [${exception}]`,
+              "error"
+            ); // eslint-disable-line no-console
+            return false;
+          }
+        };
 
-      const cleaner = (ast, callback) => {
-        const decisionsCache = {}
+        const cleaner = (ast, callback) => {
+          const decisionsCache = {};
 
-        const clean = (children, cb) => children.filter((child) => {
-          if (child.type === 'Rule') {
-            const values = child.prelude.value.split(',').map(x => x.trim())
-            const keepValues = values.filter((selectorString) => {
-              if (decisionsCache[selectorString]) {
-                return decisionsCache[selectorString]
+          const clean = (children, cb) =>
+            children.filter(child => {
+              if (child.type === "Rule") {
+                const values = child.prelude.value
+                  .split(",")
+                  .map(x => x.trim());
+                const keepValues = values.filter(selectorString => {
+                  if (decisionsCache[selectorString]) {
+                    return decisionsCache[selectorString];
+                  }
+                  const keep = cb(selectorString);
+                  decisionsCache[selectorString] = keep;
+                  return keep;
+                });
+                if (keepValues.length) {
+                  // re-write the selector value
+                  child.prelude.value = keepValues.join(", ");
+                  return true;
+                }
+                return false;
+              } else if (child.type === "Atrule" && child.name === "media") {
+                // recurse
+                child.block.children = clean(child.block.children, cb);
+                return child.block.children.length > 0;
               }
-              const keep = cb(selectorString)
-              decisionsCache[selectorString] = keep
-              return keep
-            })
-            if (keepValues.length) {
-              // re-write the selector value
-              child.prelude.value = keepValues.join(', ')
-              return true
+              // The default is to keep it.
+              return true;
+            });
+
+          ast.children = clean(ast.children, callback);
+          return ast;
+        };
+
+        const links = Array.from(document.querySelectorAll("link"));
+
+        links
+          .filter(
+            link =>
+              link.href &&
+              (link.rel === "stylesheet" ||
+                link.href.toLowerCase().endsWith(".css")) &&
+              !link.href.toLowerCase().startsWith("blob:") &&
+              link.media !== "print"
+          )
+          .forEach(stylesheet => {
+            if (!stylesheetAstObjects[stylesheet.href]) {
+              throw new Error(`${stylesheet.href} not in stylesheetAstObjects`);
             }
-            return false
-          } else if (child.type === 'Atrule' && child.name === 'media') {
-            // recurse
-            child.block.children = clean(child.block.children, cb)
-            return child.block.children.length > 0
-          }
-          // The default is to keep it.
-          return true
-        })
+            if (!Object.keys(stylesheetAstObjects[stylesheet.href]).length) {
+              // If the 'stylesheetAstObjects[stylesheet.href]' thing is an
+              // empty object, simply skip this link.
+              return;
+            }
+            const ast = stylesheetAstObjects[stylesheet.href];
+            cleanedStyles.push(cleaner(ast, checker));
+          });
+        stylesheetAstArray.forEach(ast => {
+          cleanedStyles.push(cleaner(ast, checker));
+        });
 
-        ast.children = clean(ast.children, callback)
-        return ast
-      }
+        return cleanedStyles;
+      },
+      stylesheetAstObjects,
+      stylesheetAstArray
+    );
 
-      const links = Array.from(document.querySelectorAll('link'))
-
-      links
-        .filter(link => (
-          link.href &&
-            (link.rel === 'stylesheet' ||
-              link.href.toLowerCase().endsWith('.css')) &&
-            !link.href.toLowerCase().startsWith('blob:') &&
-            link.media !== 'print'
-        ))
-        .forEach((stylesheet) => {
-          if (!stylesheetAstObjects[stylesheet.href]) {
-            throw new Error(`${stylesheet.href} not in stylesheetAstObjects`)
-          }
-          if (!Object.keys(stylesheetAstObjects[stylesheet.href]).length) {
-            // If the 'stylesheetAstObjects[stylesheet.href]' thing is an
-            // empty object, simply skip this link.
-            return
-          }
-          const ast = stylesheetAstObjects[stylesheet.href]
-          cleanedStyles.push(cleaner(ast, checker))
-        })
-      stylesheetAstArray.forEach((ast) => {
-        cleanedStyles.push(cleaner(ast, checker))
+    const allCleanedCSS = cleanedCSS
+      .map(ast => {
+        const cleanedAst = fromPlainObject(ast);
+        return generate(cleanedAst);
       })
+      .join("\n");
 
-      return cleanedStyles
-    }, stylesheetAstObjects, stylesheetAstArray)
-
-    const allCleanedCSS = cleanedCSS.map((ast) => {
-      const cleanedAst = fromPlainObject(ast)
-      return generate(cleanedAst)
-    }).join('\n')
-
-    const finalCss = collectImportantComments(allCleanedCSS)
+    const finalCss = collectImportantComments(allCleanedCSS);
     // finalCss = minify(finalCss).css ? `html-minifier` use `clean-css` as css minifier
     // so don't need to use another mimifier.
     let shellHtml = `<!DOCTYPE html>
       <html lang="en">
       <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8" />
+        <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+        <meta content="telephone=no" name="format-detection" />
+        <meta content="email=no" name="format-detection" />
         <title>Page Skeleton</title>
+        <link rel="stylesheet" href="https://cvip.fui.fenqile.cn/res/css/common/vip_m.d5f5c08.css" type="text/css" />
+        <script src="https://cres.leka.club/web_leka/js/common/flexible.js"></script>
         <style>
           $$css$$
         </style>
@@ -227,45 +255,47 @@ class Skeleton {
       <body>
         $$html$$
       </body>
-      </html>`
+      </html>`;
     shellHtml = shellHtml
-      .replace('$$css$$', finalCss)
-      .replace('$$html$$', cleanedHtml)
+      .replace("$$css$$", finalCss)
+      .replace("$$html$$", cleanedHtml);
     const result = {
       originalRoute: route,
-      route: await page.evaluate('window.location.pathname'),
+      route: await page.evaluate("window.location.pathname"),
       html: htmlMinify(shellHtml, false)
-    }
-    await this.closePage(page)
-    return Promise.resolve(result)
+    };
+    await this.closePage(page);
+    return Promise.resolve(result);
   }
 
   async renderRoutes(origin, routes = this.options.routes) {
-    return Promise.all(routes.map((route) => {
-      const url = `${origin}${route}`
-      return this.genHtml(url, route)
-    }))
+    return Promise.all(
+      routes.map(route => {
+        const url = `${origin}${route}`;
+        return this.genHtml(url, route);
+      })
+    );
   }
 
   async destroy() {
-    const { log } = this
+    const { log } = this;
     if (this.pages.size) {
-      const promises = []
+      const promises = [];
       for (const page of this.pages) {
-        promises.push(page.close())
+        promises.push(page.close());
       }
       try {
-        await Promise.all(promises)
+        await Promise.all(promises);
       } catch (err) {
-        log(err)
+        log(err);
       }
-      this.pages = null
+      this.pages = null;
     }
     if (this.browser) {
-      await this.browser.close()
-      this.browser = null
+      await this.browser.close();
+      this.browser = null;
     }
   }
 }
 
-module.exports = Skeleton
+module.exports = Skeleton;

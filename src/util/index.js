@@ -62,9 +62,9 @@ function addScriptTag(source, src, port) {
     </script>
     <script type="text/javascript" src="${src}" defer></script>
     <script>
-        setTimeout(()=>{
-            window.toggleBar
-        }, 1000)
+        // setTimeout(()=>{
+            // window.toggleBar
+        // }, 1000)
     </script>
     `
   return `${token[0]}${scriptTag}</body>${token[1]}`

@@ -18,7 +18,8 @@
       </div>
     </section>
     <section class="body">
-      <iframe :src="url" frameborder="0" :class="{origin: type === 'origin'}"></iframe>
+      <!-- :class="{origin: type === 'origin'}" -->
+      <iframe :src="url" frameborder="0" class="origin"></iframe>
     </section>
     <section class="bottom"></section>
   </div>

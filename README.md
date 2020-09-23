@@ -25,7 +25,10 @@ https://github.com/Jocs/jocs.github.io/issues/2
 <hr />
 
 
-更新npm 包
+### 更新npm 包
+```
+npm publish
+```
 
 
 <div align="center">
