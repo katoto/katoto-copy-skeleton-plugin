@@ -1,6 +1,6 @@
 {
   "name": "@katoto/skeleton-plugin",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": false,
   "description": "一种自动生成骨架工具",
   "main": "index.js",
@@ -15,10 +15,17 @@
     "build:script": "rollup --config src/script/rollup.config.js",
     "prepare": "npm run build:index && npm run build:sockjs && npm run build:preview && npm run build:script"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/katoto/katoto-copy-skeleton-plugin.git"
+  },
   "keywords": [
+    "@katoto/skeleton-plugin",
     "puppeteer",
     "page skeleton",
-    "webpack"
+    "webpack",
+    "Framework",
+    "plugin"
   ],
   "dependencies": {
     "chalk": "^2.4.1",
