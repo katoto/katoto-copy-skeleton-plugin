@@ -1,114 +1,71 @@
-### copy ElemeFE page-skeleton-webpack-plugin
+## 一种自动生成骨架屏
 
-katoto-copy-skeleton-plugin clone ElemeFE 的版本，修改一下业务相关的东西
+### 什么是骨架屏？
 
+对比情况看下下图：
+
+![效果图](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0773677fd0934cf08021f6aed5596bbb~tplv-k3u1fbpfcp-watermark.image)
+
+骨架屏指的是当你打开一个 web 页面，在页面解析和数据加载之前，首先展示给用户大概的样式。
+
+### 生成步骤
+![效果图](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f5560d0d75be49fd814dbb46493fad47~tplv-k3u1fbpfcp-watermark.image)
+### DOM 节点生成
+![效果图](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ee1c14713cfa433f960c91a0d72dada2~tplv-k3u1fbpfcp-watermark.image)
+
+### 可视区判断
+![效果图](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c58d594f09e54727afa978d2842c807d~tplv-k3u1fbpfcp-watermark.image)
 ### 修改部分
+
 
 - 修复一些已知插件问题，详见 [官方 Demo 踩坑](https://juejin.im/post/5ed4c22ae51d4578810b5459)
 - 去除原 after-emit 的 outputSkeletonScreen， 改用自己的
 - 优化预览二维码，实现实时修改样式，二维码实时更新
 - 手机扫一扫预览，加入适配 flexible.js,保证看到的样式更真实
 - 调整 priview 预览，把原 1280 宽度改成 375 手机宽度
+- 基础到cli中
 
-### 待修改项
 
-- 打包之后没有适配 js ，会看到初始样式，然后是适配后的样式。 这些需要修改公共 js
-- 迁移到 web_leka
-- 是否可生成 weex 形式
-- 生成的骨架屏图片宽高有点不对
+###  目前优化点
++ 删除可视区外的元素。（已有）
++ 双伪元素判断优化。
++ 去除shapeOpposite 配置项。
++ 对无关的标签属性进行去除，减小骨架代码体积，像img 标签的resize、border、align ;button 标签的type value disabled 等属性。
++ 新增a标签的属性处理，像href、title、target、download 等属性。
++ 去除部分冗余注释，像<!---->。
 
-附上该插件的简易时序图
-![](https://raw.githubusercontent.com/katoto/katoto-copy-skeleton-plugin/master/skeletonImg.jpg)
+最终效果，"从9534行, 减到6987行"
 
-https://github.com/Jocs/jocs.github.io/issues/2
+### 待优化
++ list 列表的判断处理，目前仅判断UL/OL 标签，且子元素是LI 的，才进行处理。
++ 去除骨架中的文字。
++ 是否可生成 weex 形式
++ 生成的骨架屏图片宽高有点不对
+
+
+### 附上该插件的简易时序图
+![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cc8fc5224e1147a2985866a543784b19~tplv-k3u1fbpfcp-zoom-1.image)
+
+
 
 <hr />
 
-
-### 更新npm 包
-```
-npm publish
-```
-
-
 <div align="center">
-
   <h3>
-    <a href="https://zhuanlan.zhihu.com/p/34702561">
-      Blog
+    <a href="https://juejin.cn/post/6847902219509956616">
+      Blog 文章
     </a>
-   <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin/blob/master/docs/i18n/zh_cn.md">
-      中文
-    </a>
-   <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#features">
-      Features
-    </a>
-   <span> | </span>
-​    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#examples">
-      Examples
-    </a>
-​    <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#installation">
-      Install
-    </a>
-    <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#basic-use">
-      Basic Use
-    </a>
-    <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#documents">
-      Documents
-    </a>
-    <span> | </span>
-    <a href="https://github.com/ElemeFE/page-skeleton-webpack-plugin#contribution">
-      Contribution
+    <a href="https://juejin.cn/post/6844904177936629774">
+      踩坑记录
     </a>
   </h3>
 </div>
 
-<br />
 
 ![](https://github.com/ElemeFE/page-skeleton-webpack-plugin/raw/master/docs/workflow.gif)
 
-### Features
-
-Page Skeleton is a webpack plugin.The purpose of the plugin is to generate the corresponding skeleton screen page according to different route pages in your project, and to pack the skeleton screen page into the corresponding static route page through webpack.
-
-- Support multiple loading animations
-- Preview on mobile
-- Support multiple routes
-- Can be customized, and also directly modify the skeleton page source code in the preview page
-- Almost zero configuration available
-
-<h4 align="center">Loading animations</h4>
-
-|         Spin         |         Shine         |         Chiaroscuro         |
-| :------------------: | :-------------------: | :-------------------------: |
-| ![](./docs/spin.gif) | ![](./docs/shine.gif) | ![](./docs/chiaroscuro.gif) |
-
-_speed up play_
-
-### Examples
-
-All examples are in the `examples` folder.
-
-- [**sale**](https://github.com/ElemeFE/page-skeleton-webpack-plugin/tree/master/examples/sale)
 
 ### Installation
-
-Use `npm` to install this plugin, and you also need to install [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin).
-
-> npm install --save-dev page-skeleton-webpack-plugin
->
-> npm install --save-dev html-webpack-plugin
-
-### Basic Use
-
-**Step 1：configration**
-
-After installing the plug-in according to the above tutorial, you need to configure the plugin so that the plugin can run normally. The plugin will perform different operations depending on the environment of the node. When `NODE_ENV === 'development'`, the plug-in can perform operations for generating and writing skeleton pages.
 
 ```javascript
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -133,8 +90,6 @@ const webpackConfig = {
 };
 ```
 
-:notebook_with_decorative_cover:Since the plugin selects different operations based on the `process.env.NODE_ENV` environment variable, so you need to configurate environment variables in the `scrpt` option in the `package.json` file as follows:
-
 ```json
 "scripts": {
   "dev": "cross-env NODE_ENV=development node server.js",
@@ -142,7 +97,6 @@ const webpackConfig = {
 }
 ```
 
-That is, setting `NODE_ENV` to `development` in the development environment and `NODE_ENV` to `production` in the production environment.
 
 #### Step 2：Modify template `index.html` of html-webpack-plugin
 
@@ -164,18 +118,6 @@ Add comment `<!-- shell -->` in the root element of you application.
 ```
 
 #### Step 3：Operations and write shell
-
-In the development page, use CtrlOrCmd + enter to call out the plugin interactive interface, or enter the `toggleBar` callout interface in the browser's JavaScript console.
-
-![](./docs/step1.jpg)
-
-Click the button in the interactive interface to preview the skeleton page. This process may take about 20s. After the plugin is ready for the skeleton page, it will automatically open the preview page through the browser, as shown below.
-
-![](./docs/step2.jpg)
-
-Scan the QR code in the preview page to preview the skeleton page on the mobile phone. You can directly edit the source code on the preview page. Write the skeleton page into the shell.html file by clicking the Write button in the upper right corner.
-
-Re-package the application with webpack. When the page is restarted, you can see the application's skeleton structure before getting the data.
 
 ### Documents
 
@@ -228,8 +170,6 @@ const pluginDefaultConfig = {
 };
 ```
 
-### License
+### 线上示例
 
-[**MIT**](https://github.com/ElemeFE/page-skeleton-webpack-plugin/blob/master/LICENSE).
-
-Copyright (c) 2017-present, @ElemeFE
+![](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/eb11b971ca884bb594776c7607cc2a34~tplv-k3u1fbpfcp-watermark.image)

@@ -1,8 +1,8 @@
 {
-  "name": "@leka/skeleton-plugin",
-  "version": "0.1.5",
+  "name": "@katoto/skeleton-plugin",
+  "version": "0.1.10",
   "private": false,
-  "description": "web site skeleton generator",
+  "description": "一种自动生成骨架工具",
   "main": "index.js",
   "scripts": {
     "beautify": "npm run lint --fix",
